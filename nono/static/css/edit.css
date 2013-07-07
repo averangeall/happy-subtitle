@@ -12,10 +12,6 @@ body {
     margin-right: 40px;
 }
 
-div.y-blank {
-    height: 30px;
-}
-
 #lines {
     width: 250px;
     height: 500px;
