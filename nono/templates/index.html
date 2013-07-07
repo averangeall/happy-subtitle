@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -5,11 +6,62 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="description" content="subtitle">
         <meta name="author" content="averangeall">
-        <link rel="stylesheet" type="text/css" href="css/XXX.css">
+        <link rel="stylesheet" type="text/css" href="{% static "css/flat-ui.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}">
     </head>
 
     <body>
-        <h1>妞妞配字幕</h1>
+        <div class="y-blank"></div>
+        <div id="left">
+            <div id="open-save" align="center">
+                <a href="javascript: void(0);" class="btn btn-large btn-primary">開啟影片</a>
+                <a href="javascript: void(0);" class="btn btn-large disabled">下載影片</a>
+            </div>
+            <div class="y-blank"></div>
+            <div id="lines" class="todo">
+                <ul>
+                    <li>
+                        <div class="todo-content">
+                            <h4 class="todo-name">嗨 Kai 你好</h4>
+                            00:02.2 - 00:05.2
+                        </div>
+                    </li>
+                    <li class="todo-done">
+                        <div class="todo-content">
+                            <div class="fui-plus"></div>
+                            <h4 class="todo-name">新增一句</h4>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="right">
+            <div class="span8 demo-video">
+                <video class="video-js" controls
+                       preload="auto" width="620" height="300"
+                       poster="{% static "images/empty-video.png" %}" data-setup="{}">
+                </video>
+            </div>
+            <div class="y-blank"></div>
+            <table>
+                <tr>
+                    <td>
+                        <div align="center"><h3>字幕出現</h3></div>
+                        <input type="text" value="00:00:00" class="timing span4" />
+                    </td>
+                    <td rowspan="2">
+                        <textarea id="input-line"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div align="center"><h3>字幕隱藏</h3></div>
+                        <input type="text" value="00:00:00" class="timing span4" />
+                    </td>
+                </tr>
+            </table>
+        </div>
     </body>
 </html>
 
