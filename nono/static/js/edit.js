@@ -1,3 +1,6 @@
+var player;
+var countId;
+
 function addYoutube(videoId) {
     swfobject.embedSWF('http://www.youtube.com/v/' + videoId + '?enablejsapi=1&playerapiid=video&version=3',
                        'video', "550", "360", "8", null, null, 
@@ -5,6 +8,23 @@ function addYoutube(videoId) {
 }
 
 function getVideoId(url) {
+}
+
+function startCount(timing) {
+    countId = setInterval(function() {
+        var second = parseInt(video.getCurrentTime());
+        var date = new Date(second * 1000);
+        var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
+        var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
+        timing.val(mm + ':' + ss);
+    }, 100);
+}
+
+function onYouTubePlayerReady(playerId) {
+    player = $('#video');
+    video.playVideo();
+    startCount($('#start-timing'));
+    $('#start-check').removeClass('btn-disabled').addClass('btn-info');
 }
 
 $('#youtube-submit').click(function() {
@@ -32,4 +52,3 @@ $('#youtube-submit').click(function() {
 });
 
 //var video = document.getElementById('video');
-//var time = video.getCurrentTime();
