@@ -44,7 +44,7 @@ span {
     width: 400px;
 }
 
-#start-check {
+#start-check, #end-check {
     width: 30px;
 }
 

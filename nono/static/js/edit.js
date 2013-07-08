@@ -7,9 +7,6 @@ function addYoutube(videoId) {
                        {allowScriptAccess: "always"}, {id: 'video'});
 }
 
-function getVideoId(url) {
-}
-
 function startCount(timing) {
     countId = setInterval(function() {
         var second = parseInt(video.getCurrentTime());
@@ -20,11 +17,25 @@ function startCount(timing) {
     }, 100);
 }
 
+function enableCheck(check) {
+    check.removeClass('btn-disabled').addClass('btn-info');
+    check.click(function() {
+        check.removeClass('btn-info').addClass('btn-success');
+        clearInterval(countId);
+        if(check.attr('id') == 'start-check') {
+            startCount($('#end-timing'));
+            enableCheck($('#end-check'));
+        } else if(check.attr('id') == 'end-check') {
+            video.pauseVideo();
+        }
+    });
+}
+
 function onYouTubePlayerReady(playerId) {
     player = $('#video');
     video.playVideo();
     startCount($('#start-timing'));
-    $('#start-check').removeClass('btn-disabled').addClass('btn-info');
+    enableCheck($('#start-check'));
 }
 
 $('#youtube-submit').click(function() {
