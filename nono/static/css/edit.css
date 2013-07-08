@@ -2,18 +2,21 @@ body {
     overflow: hidden;
 }
 
+span {
+    font-size: 26px;
+}
+
+.fui-check {
+    width: 10px;
+}
+
 #left {
     float: left;
     margin-left: 40px;
 }
 
-#right {
-    float: right;
-    margin-right: 40px;
-}
-
 #lines {
-    width: 250px;
+    width: 350px;
     height: 500px;
     overflow: auto;
 }
@@ -25,5 +28,23 @@ body {
 
 .timing {
     text-align: center;
+}
+
+#video {
+    text-align: center;
+}
+
+#detail {
+    position: absolute;
+    right: 40px;
+    bottom: 30px;
+}
+
+#youtube-url {
+    width: 400px;
+}
+
+#start-check {
+    width: 30px;
 }
 

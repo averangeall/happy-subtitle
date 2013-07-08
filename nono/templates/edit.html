@@ -15,7 +15,8 @@
         <div class="y-blank"></div>
         <div id="left">
             <div id="save" align="center">
-                <a href="javascript: void(0);" class="btn btn-large btn-primary">下載影片</a>
+                <a href="javascript: void(0);" class="btn btn-large btn-disabled">下載影片</a>
+                <a href="javascript: void(0);" class="btn btn-large btn-disabled">下載字幕檔</a>
             </div>
             <div class="y-blank"></div>
             <div id="lines" class="todo">
@@ -37,18 +38,20 @@
         </div>
 
         <div id="right">
-            <div class="span8 demo-video">
-                <video class="video-js" controls
-                       preload="auto" width="620" height="300"
-                       poster="{% static "images/empty-video.png" %}" data-setup="{}">
-                </video>
+            <div id="video" align="center">
+                <input id="youtube-url" type="text" placeholder="請輸入 Youtube 網址" />
+                <a id="youtube-submit" href="javascript: void(0);" class="btn btn-large btn-primary">送出</a>
+                <h2 id="youtube-msg"></h2>
             </div>
             <div class="y-blank"></div>
-            <table>
+            <table id="detail">
                 <tr>
                     <td>
-                        <div align="center"><h3>字幕出現</h3></div>
-                        <input type="text" value="00:00:00" class="timing span4" />
+                        <div align="center">
+                            <a id="start-check" href="javascript: void(0);" class="btn btn-disabled fui-check"></a>
+                            <span>字幕出現</span>
+                        </div>
+                        <input type="text" value="00:00" class="timing span4" />
                     </td>
                     <td rowspan="2">
                         <textarea id="input-line"></textarea>
@@ -56,12 +59,19 @@
                 </tr>
                 <tr>
                     <td>
-                        <div align="center"><h3>字幕隱藏</h3></div>
-                        <input type="text" value="00:00:00" class="timing span4" />
+                        <div align="center">
+                            <a id="end-check" href="javascript: void(0);" class="btn btn-disabled fui-check"></a>
+                            <span>字幕隱藏</span>
+                        </div>
+                        <input type="text" value="00:00" class="timing span4" />
                     </td>
                 </tr>
             </table>
         </div>
+
+        <script src="{% static "js/jquery-1.8.2.min.js" %}"></script>
+        <script src="{% static "js/swfobject.js" %}"></script>
+        <script src="{% static "js/edit.js" %}"></script>
     </body>
 </html>
 
