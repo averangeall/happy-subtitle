@@ -161,14 +161,23 @@ function enableTiming(timing) {
             return false;
 
         if(code == 38 || code == 40) {
-            var match = timing.val().match(/(\d+):(\d+)\.(\d+)/);
+            var match = timing.val().match(/(\d+):(\d+)\.(\d)/);
             if(match == null)
                 showCurDetail();
             else {
                 var mm = parseInt(match[1]);
                 var ss = parseInt(match[2]);
                 var ii = parseInt(match[3]);
-                var seconds = mm * 60 + ss + ii / 1000.0;
+                if(code == 38)
+                    ii += 2;
+                else if(code == 40)
+                    ii -= 2;
+                var seconds = mm * 60 + ss + ii / 10.0;
+                if(seconds < 0)
+                    seconds = 0;
+                if(seconds > 60 * 60)
+                    seconds = 60 * 60 - 0.1;
+                timing.val(getTimeStr(seconds));
             }
             return false;
         }
