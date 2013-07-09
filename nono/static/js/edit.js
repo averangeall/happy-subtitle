@@ -19,38 +19,48 @@ function getYoutubeId(url) {
     return videoId;
 }
 
-function startCount(timing) {
-    countId = setInterval(function() {
-        var second = parseInt(video.getCurrentTime());
-        var date = new Date(second * 1000);
-        var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
-        var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
-        timing.val(mm + ':' + ss + '.0');
-    }, 100);
-}
-
-function setAccurateTiming(timing) {
-    var second = parseFloat(video.getCurrentTime());
-    var date = new Date(second * 1000);
+function getTimeStr(seconds) {
+    seconds = parseFloat(String(seconds));
+    var date = new Date(seconds * 1000.0);
     var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
     var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
-    var ii = Math.floor(date.getMilliseconds() / 100);
-    timing.val(mm + ':' + ss + '.' + ii);
+    var ii = Math.floor(date.getMilliseconds() / 100.0);
+    return (mm + ':' + ss + '.' + ii);
 }
 
-function enableCheck(check) {
+function setTiming(timing) {
+    timing.val(getTimeStr(video.getCurrentTime()));
+}
+
+function startCount(timing) {
+    countId = setInterval(function() {
+        setTiming(timing);
+    }, 90);
+}
+
+function disableAllChecks() {
+    $.each([$('#start-check'), $('#end-check')], function(idx, value) {
+        value.removeClass('btn-success')
+             .removeClass('btn-info')
+             .addClass('btn-disabled');
+    });
+}
+
+function setCheckClick(check) {
     check.removeClass('btn-disabled').addClass('btn-info');
     check.click(function() {
+        if(check.hasClass('btn-disabled') || check.hasClass('btn-success') || !check.hasClass('btn-info'))
+            return;
         check.removeClass('btn-info').addClass('btn-success');
         clearInterval(countId);
         if(check.attr('id') == 'start-check') {
             startCount($('#end-timing'));
-            enableCheck($('#end-check'));
-            setAccurateTiming($('#start-timing'));
+            $('#end-check').removeClass('btn-disabled').addClass('btn-info');
+            setTiming($('#start-timing'));
             lines[curLineId].start = $('#start-timing').val();
         } else if(check.attr('id') == 'end-check') {
             video.pauseVideo();
-            setAccurateTiming($('#end-timing'));
+            setTiming($('#end-timing'));
             lines[curLineId].end = $('#end-timing').val();
         }
         updateAllLines();
@@ -101,14 +111,22 @@ function updateAllLines() {
     });
 }
 
-function showDetail() {
+function showCurDetail() {
     $('#input-line').val(lines[curLineId].words);
+    if(video.getPlayerState() != 1) {
+        $('#start-timing').val(lines[curLineId].start);
+        $('#end-timing').val(lines[curLineId].end);
+    }
 }
 
 function addNewLine() {
     curLineId = createLine();
     updateAllLines();
-    showDetail();
+    showCurDetail();
+    disableAllChecks();
+    $('#start-check').removeClass('btn-disabled').addClass('btn-info');
+    video.playVideo();
+    startCount($('#start-timing'));
 }
 
 function putAddNewLine() {
@@ -134,6 +152,20 @@ function enableTiming(timing) {
                     code == 186; // colon sign
         if(!valid)
             return false;
+
+        if(code == 38 || code == 40) {
+            var match = timing.val().match(/(\d+):(\d+)\.(\d+)/);
+            if(match == null)
+                showCurDetail();
+            else {
+                var mm = parseInt(match[1]);
+                var ss = parseInt(match[2]);
+                var ii = parseInt(match[3]);
+                var seconds = mm * 60 + ss + ii / 1000.0;
+            }
+            return false;
+        }
+
         return true;
     });
 }
@@ -165,14 +197,13 @@ function showVideo() {
 }
 
 function onYouTubePlayerReady(playerId) {
-    startCount($('#start-timing'));
-    enableCheck($('#start-check'));
+    setCheckClick($('#start-check'));
+    setCheckClick($('#end-check'));
     enableTiming($('#start-timing'));
     enableTiming($('#end-timing'));
     putAddNewLine();
     addNewLine();
     enableInputLine();
-    video.playVideo();
 }
 
 $('#youtube-submit').click(showVideo);
