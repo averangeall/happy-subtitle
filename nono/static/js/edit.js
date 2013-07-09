@@ -8,6 +8,17 @@ function addYoutube(videoId) {
                        {allowScriptAccess: "always"}, {id: 'video'});
 }
 
+function getYoutubeId(url) {
+    var match1 = url.match(/.+youtube.com\/watch\?.*(v=([^&]+)).*/);
+    var match2 = url.match(/youtu.be\/(.+)/);
+    var videoId = null;
+    if(match1 != null)
+        videoId = match1[2];
+    if(match2 != null)
+        videoId = match2[1];
+    return videoId;
+}
+
 function startCount(timing) {
     countId = setInterval(function() {
         var second = parseInt(video.getCurrentTime());
@@ -66,28 +77,29 @@ function putAddNewLine() {
     $('#lines-add').append($('<li/>').addClass('todo-done').append(add));
 }
 
+function enableDetail() {
+    $('#start-timing').removeAttr('disabled');
+    $('#end-timing').removeAttr('disabled');
+    $('#input-line').removeAttr('disabled');
+}
+
 $('#youtube-submit').click(function() {
     var url = $.trim($('#youtube-url').val());
     if(url == '') {
         $('#youtube-msg').html('請輸入 Youtube 的網址!!');
         return;
     }
-    var match1 = url.match(/.+youtube.com\/watch\?.*(v=([^&]+)).*/);
-    var match2 = url.match(/youtu.be\/(.+)/);
-    if(match1 == null && match2 == null) {
+    var videoId = getYoutubeId(url);
+    if(videoId == null) {
         $('#youtube-msg').html('網址好像怪怪的!!');
         return;
     }
-    var videoId = '';
-    if(match1 != null)
-        videoId = match1[2];
-    if(match2 != null)
-        videoId = match2[1];
 
     $('#video').empty();
     $('#right').css('float', 'right')
                .css('margin-right', '30px');
     addYoutube(videoId);
+    enableDetail();
     putAddNewLine();
 });
 
