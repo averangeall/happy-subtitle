@@ -13,11 +13,14 @@ span.big {
 #left {
     float: left;
     margin-left: 40px;
+    height: 100%;
 }
 
 #lines {
+    position: absolute;
     width: 350px;
-    height: 500px;
+    top: 100px;
+    bottom: 0;
     overflow: auto;
 }
 
