@@ -89,6 +89,7 @@ function updateAllLines() {
     var sortedLines = [];
     for(var lineId in lines)
         sortedLines.push(lines[lineId]);
+
     sortedLines.sort(function(line1, line2) {
         if(line1.pos < line2.pos)
             return -1;
@@ -107,6 +108,12 @@ function updateAllLines() {
                               .addClass('todo-content')
                               .append(words)
                               .append($('<span>').html(value.start + ' - ' + value.end));
+        if(curLineId == value.id)
+            line.prepend($('<span/>').addClass('fui-check'));
+        line.click(function() {
+            curLineId = value.id;
+            updateAllLines();
+        });
         $('#lines-content').append($('<li/>').append(line));
     });
 }
