@@ -1,4 +1,3 @@
-var player;
 var countId;
 var curLineId;
 var lines = [];
@@ -30,6 +29,9 @@ function startCount(timing) {
     }, 100);
 }
 
+function setAccurateTiming() {
+}
+
 function enableCheck(check) {
     check.removeClass('btn-disabled').addClass('btn-info');
     check.click(function() {
@@ -38,9 +40,13 @@ function enableCheck(check) {
         if(check.attr('id') == 'start-check') {
             startCount($('#end-timing'));
             enableCheck($('#end-check'));
+            setAccurateTiming();
+            lines[curLineId].start = $('#start-timing').val();
         } else if(check.attr('id') == 'end-check') {
             video.pauseVideo();
+            lines[curLineId].end = $('#end-timing').val();
         }
+        updateAllLines();
     });
 }
 
@@ -54,8 +60,8 @@ function createLine() {
     var pos = Object.keys(lines).length;
     lines[lineId] = {
         words: '一句台詞',
-        start: '00:00.0',
-        end: '00:00.0',
+        start: '00:00',
+        end: '00:00',
         pos: pos,
         id: lineId,
     };
@@ -106,9 +112,23 @@ function putAddNewLine() {
     $('#lines-add').append($('<li/>').addClass('todo-done').append(add));
 }
 
-function enableTiming() {
-    $('#start-timing').removeAttr('disabled');
-    $('#end-timing').removeAttr('disabled');
+function enableTiming(timing) {
+    timing.removeAttr('disabled');
+    timing.keydown(function(evt) {
+        if(video.getPlayerState() == 1)
+            return false;
+        var code = evt.which;
+        console.log(code);
+        var valid = (code >= 48 && code <= 57) || // left numbers
+                    (code >= 96 && code <= 105) || // right numbers
+                    (code >= 37 && code <= 40) || // arrow keys
+                    code == 8 || // backspace
+                    code == 46 || // delete
+                    code == 186; // colon sign
+        if(!valid)
+            return false;
+        return true;
+    });
 }
 
 function enableInputLine() {
@@ -138,10 +158,10 @@ function showVideo() {
 }
 
 function onYouTubePlayerReady(playerId) {
-    player = $('#video');
     startCount($('#start-timing'));
     enableCheck($('#start-check'));
-    enableTiming();
+    enableTiming($('#start-timing'));
+    enableTiming($('#end-timing'));
     putAddNewLine();
     addNewLine();
     enableInputLine();
