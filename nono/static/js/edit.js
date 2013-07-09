@@ -1,6 +1,7 @@
 var player;
 var countId;
-var lineIds = [];
+var curLineId;
+var lines = [];
 
 function addYoutube(videoId) {
     swfobject.embedSWF('http://www.youtube.com/v/' + videoId + '?enablejsapi=1&playerapiid=video&version=3',
@@ -43,30 +44,58 @@ function enableCheck(check) {
     });
 }
 
-function onYouTubePlayerReady(playerId) {
-    player = $('#video');
-    video.playVideo();
-    startCount($('#start-timing'));
-    enableCheck($('#start-check'));
-}
-
-function createLineId() {
+function createLine() {
     var lineId;
     while(true) {
-        lineId = 'line-' + Math.floor(Math.random() * 100000);
-        if($.inArray(lineId, lineIds) == -1)
+        lineId = Math.floor(Math.random() * 100000);
+        if($.inArray(lineId, Object.keys(lines)) == -1)
             break;
     }
-    lineIds.push(lineId);
+    var pos = Object.keys(lines).length;
+    lines[lineId] = {
+        words: '一句台詞',
+        start: '00:00.0',
+        end: '00:00.0',
+        pos: pos,
+        id: lineId,
+    };
     return lineId;
 }
 
+function updateAllLines() {
+    var sortedLines = [];
+    for(var lineId in lines)
+        sortedLines.push(lines[lineId]);
+    sortedLines.sort(function(line1, line2) {
+        if(line1.pos < line2.pos)
+            return -1;
+        if(line1.pos > line2.pos)
+            return 1;
+        return 0;
+    });
+
+    $('#lines-content').empty();
+    $.each(sortedLines, function(idx, value) {
+        var words = $('<h4/>').addClass('todo-name')
+                              .html(value.words);
+        if($.trim(value.words) == '')
+            words.html($('<br/>'));
+        var line = $('<div/>').attr('id', 'line-' + value.id)
+                              .addClass('todo-content')
+                              .append(words)
+                              .append($('<span>').html(value.start + ' - ' + value.end));
+        $('#lines-content').append($('<li/>').append(line));
+    });
+}
+
+function showDetail() {
+    $('#input-line').val(lines[curLineId].words);
+}
+
 function addNewLine() {
-    var line = $('<div/>').attr('id', createLineId())
-                          .addClass('todo-content')
-                          .append($('<h4/>').addClass('todo-name').html('一句台詞'))
-                          .append($('<span>').html('00:00.0 - 00:00.0'));
-    $('#lines-content').append($('<li/>').append(line));
+    curLineId = createLine();
+    updateAllLines();
+    showDetail();
 }
 
 function putAddNewLine() {
@@ -77,13 +106,20 @@ function putAddNewLine() {
     $('#lines-add').append($('<li/>').addClass('todo-done').append(add));
 }
 
-function enableDetail() {
+function enableTiming() {
     $('#start-timing').removeAttr('disabled');
     $('#end-timing').removeAttr('disabled');
-    $('#input-line').removeAttr('disabled');
 }
 
-$('#youtube-submit').click(function() {
+function enableInputLine() {
+    $('#input-line').removeAttr('disabled')
+                    .keyup(function(evt) {
+                        lines[curLineId].words = $('#input-line').val();
+                        updateAllLines();
+                    });
+}
+
+function showVideo() {
     var url = $.trim($('#youtube-url').val());
     if(url == '') {
         $('#youtube-msg').html('請輸入 Youtube 的網址!!');
@@ -99,7 +135,23 @@ $('#youtube-submit').click(function() {
     $('#right').css('float', 'right')
                .css('margin-right', '30px');
     addYoutube(videoId);
-    enableDetail();
+}
+
+function onYouTubePlayerReady(playerId) {
+    player = $('#video');
+    startCount($('#start-timing'));
+    enableCheck($('#start-check'));
+    enableTiming();
     putAddNewLine();
+    addNewLine();
+    enableInputLine();
+    video.playVideo();
+}
+
+$('#youtube-submit').click(showVideo);
+$('#youtube-url').focus();
+$('#youtube-url').keyup(function(evt) {
+    if(evt.which == 13)
+        showVideo();
 });
 
