@@ -21,11 +21,25 @@ function getYoutubeId(url) {
 
 function getTimeStr(seconds) {
     seconds = parseFloat(String(seconds));
+    if(seconds < 0)
+        seconds = 0;
+    if(seconds > 60 * 60)
+        seconds = 60 * 60 - 0.1;
     var date = new Date(seconds * 1000.0);
     var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
     var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
     var ii = Math.floor(date.getMilliseconds() / 100.0);
     return (mm + ':' + ss + '.' + ii);
+}
+
+function parseTimeStr(str) {
+    var match = $.trim(str).match(/(\d+):(\d+)\.(\d)/);
+    if(match == null)
+        return null;
+    var mm = parseInt(match[1]);
+    var ss = parseInt(match[2]);
+    var ii = parseInt(match[3]);
+    return (mm * 60 + ss + ii / 10.0);
 }
 
 function setTiming(timing) {
@@ -35,6 +49,11 @@ function setTiming(timing) {
 function startCount(timing) {
     countId = setInterval(function() {
         setTiming(timing);
+        if(timing.attr('id') == 'start-timing')
+            lines[curLineId].start = $('#start-timing').val();
+        else if(timing.attr('id') == 'end-timing')
+            lines[curLineId].end = $('#end-timing').val();
+        updateAllLines();
     }, 90);
 }
 
@@ -140,7 +159,16 @@ function putAddNewLine() {
     var add = $('<div/>').addClass('todo-content')
                          .append($('<div/>').addClass('fui-plus'))
                          .append($('<h4/>').addClass('todo-name').html('新增一句'));
-    add.click(addNewLine);
+    add.click(function() {
+        clearInterval(countId);
+        if(lines[curLineId].end == '00:00.0') {
+            console.log(video.getCurrentTime());
+            var seconds = video.getCurrentTime();
+            lines[curLineId].end = getTimeStr(seconds);
+            updateAllLines();
+        }
+        addNewLine();
+    });
     $('#lines-add').append($('<li/>').addClass('todo-done').append(add));
 }
 
@@ -161,22 +189,14 @@ function enableTiming(timing) {
             return false;
 
         if(code == 38 || code == 40) {
-            var match = timing.val().match(/(\d+):(\d+)\.(\d)/);
-            if(match == null)
+            var times = parseTimeStr(timing.val());
+            if(times == null)
                 showCurDetail();
             else {
-                var mm = parseInt(match[1]);
-                var ss = parseInt(match[2]);
-                var ii = parseInt(match[3]);
                 if(code == 38)
-                    ii += 2;
+                    seconds += 0.2;
                 else if(code == 40)
-                    ii -= 2;
-                var seconds = mm * 60 + ss + ii / 10.0;
-                if(seconds < 0)
-                    seconds = 0;
-                if(seconds > 60 * 60)
-                    seconds = 60 * 60 - 0.1;
+                    seconds -= 0.2;
                 timing.val(getTimeStr(seconds));
             }
             return false;
