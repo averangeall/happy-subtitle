@@ -21,18 +21,10 @@
             <div class="y-blank"></div>
             <div id="lines" class="todo">
                 <ul>
-                    <li>
-                        <div class="todo-content">
-                            <h4 class="todo-name">嗨 Kai 你好</h4>
-                            00:02.2 - 00:05.2
-                        </div>
-                    </li>
-                    <li class="todo-done">
-                        <div class="todo-content">
-                            <div class="fui-plus"></div>
-                            <h4 class="todo-name">新增一句</h4>
-                        </div>
-                    </li>
+                    <div id="lines-content">
+                    </div>
+                    <div id="lines-add">
+                    </div>
                 </ul>
             </div>
         </div>
@@ -49,7 +41,7 @@
                     <td>
                         <div align="center">
                             <a id="start-check" href="javascript: void(0);" class="btn btn-disabled fui-check"></a>
-                            <span>字幕出現</span>
+                            <span class="big">字幕出現</span>
                         </div>
                         <input id="start-timing" type="text" value="00:00" class="timing span4" />
                     </td>
@@ -61,7 +53,7 @@
                     <td>
                         <div align="center">
                             <a id="end-check" href="javascript: void(0);" class="btn btn-disabled fui-check"></a>
-                            <span>字幕隱藏</span>
+                            <span class="big">字幕隱藏</span>
                         </div>
                         <input id="end-timing" type="text" value="00:00" class="timing span4" />
                     </td>

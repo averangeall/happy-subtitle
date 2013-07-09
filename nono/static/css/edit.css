@@ -2,7 +2,7 @@ body {
     overflow: hidden;
 }
 
-span {
+span.big {
     font-size: 26px;
 }
 
