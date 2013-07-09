@@ -25,11 +25,17 @@ function startCount(timing) {
         var date = new Date(second * 1000);
         var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
         var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
-        timing.val(mm + ':' + ss);
+        timing.val(mm + ':' + ss + '.0');
     }, 100);
 }
 
-function setAccurateTiming() {
+function setAccurateTiming(timing) {
+    var second = parseFloat(video.getCurrentTime());
+    var date = new Date(second * 1000);
+    var mm = ((date.getMinutes() < 10) ? '0' : '') + date.getMinutes();
+    var ss = ((date.getSeconds() < 10) ? '0' : '') + date.getSeconds();
+    var ii = Math.floor(date.getMilliseconds() / 100);
+    timing.val(mm + ':' + ss + '.' + ii);
 }
 
 function enableCheck(check) {
@@ -40,10 +46,11 @@ function enableCheck(check) {
         if(check.attr('id') == 'start-check') {
             startCount($('#end-timing'));
             enableCheck($('#end-check'));
-            setAccurateTiming();
+            setAccurateTiming($('#start-timing'));
             lines[curLineId].start = $('#start-timing').val();
         } else if(check.attr('id') == 'end-check') {
             video.pauseVideo();
+            setAccurateTiming($('#end-timing'));
             lines[curLineId].end = $('#end-timing').val();
         }
         updateAllLines();
@@ -60,8 +67,8 @@ function createLine() {
     var pos = Object.keys(lines).length;
     lines[lineId] = {
         words: '一句台詞',
-        start: '00:00',
-        end: '00:00',
+        start: '00:00.0',
+        end: '00:00.0',
         pos: pos,
         id: lineId,
     };
