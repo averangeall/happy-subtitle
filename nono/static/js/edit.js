@@ -19,7 +19,17 @@ function getYoutubeId(url) {
     return videoId;
 }
 
+function toRecordTiming(seconds) {
+    if(seconds == null)
+        return null;
+    seconds = parseFloat(String(seconds));
+    seconds = Math.floor(seconds * 10.0) / 10.0;
+    return seconds;
+}
+
 function getTimeStr(seconds) {
+    if(seconds == null)
+        seconds = 0;
     seconds = parseFloat(String(seconds));
     if(seconds < 0)
         seconds = 0;
@@ -48,11 +58,12 @@ function setTiming(timing) {
 
 function startCount(timing) {
     countId = setInterval(function() {
-        setTiming(timing);
+        var curTime = video.getCurrentTime();
+        timing.val(getTimeStr(curTime));
         if(timing.attr('id') == 'start-timing')
-            lines[curLineId].start = $('#start-timing').val();
+            lines[curLineId].start = toRecordTiming(curTime);
         else if(timing.attr('id') == 'end-timing')
-            lines[curLineId].end = $('#end-timing').val();
+            lines[curLineId].end = toRecordTiming(curTime);
         updateAllLines();
     }, 90);
 }
@@ -72,15 +83,16 @@ function setCheckClick(check) {
             return;
         check.removeClass('btn-info').addClass('btn-success');
         clearInterval(countId);
+        var curTime = video.getCurrentTime();
         if(check.attr('id') == 'start-check') {
             startCount($('#end-timing'));
             $('#end-check').removeClass('btn-disabled').addClass('btn-info');
             setTiming($('#start-timing'));
-            lines[curLineId].start = $('#start-timing').val();
+            lines[curLineId].start = toRecordTiming(curTime);
         } else if(check.attr('id') == 'end-check') {
             video.pauseVideo();
             setTiming($('#end-timing'));
-            lines[curLineId].end = $('#end-timing').val();
+            lines[curLineId].end = toRecordTiming(curTime);
         }
         updateAllLines();
     });
@@ -96,8 +108,8 @@ function createLine() {
     var pos = Object.keys(lines).length;
     lines[lineId] = {
         words: '一句台詞',
-        start: '00:00.0',
-        end: '00:00.0',
+        start: null,
+        end: null,
         pos: pos,
         id: lineId,
     };
@@ -123,10 +135,11 @@ function updateAllLines() {
                               .html(value.words);
         if($.trim(value.words) == '')
             words.html($('<br/>'));
+        var timing = $('<span>').html(getTimeStr(value.start) + ' - ' + getTimeStr(value.end));
         var line = $('<div/>').attr('id', 'line-' + value.id)
                               .addClass('todo-content')
                               .append(words)
-                              .append($('<span>').html(value.start + ' - ' + value.end));
+                              .append(timing);
         if(curLineId == value.id)
             line.prepend($('<span/>').addClass('fui-check'));
         line.click(function() {
@@ -140,8 +153,8 @@ function updateAllLines() {
 function showCurDetail() {
     $('#input-line').val(lines[curLineId].words);
     if(video.getPlayerState() != 1) {
-        $('#start-timing').val(lines[curLineId].start);
-        $('#end-timing').val(lines[curLineId].end);
+        $('#start-timing').val(getTimeStr(lines[curLineId].start));
+        $('#end-timing').val(getTimeStr(lines[curLineId].end));
     }
 }
 
@@ -161,10 +174,8 @@ function putAddNewLine() {
                          .append($('<h4/>').addClass('todo-name').html('新增一句'));
     add.click(function() {
         clearInterval(countId);
-        if(lines[curLineId].end == '00:00.0') {
-            console.log(video.getCurrentTime());
-            var seconds = video.getCurrentTime();
-            lines[curLineId].end = getTimeStr(seconds);
+        if(lines[curLineId].end == null) {
+            lines[curLineId].end = lines[curLineId].start;
             updateAllLines();
         }
         addNewLine();
@@ -177,32 +188,22 @@ function enableTiming(timing) {
     timing.keydown(function(evt) {
         if(video.getPlayerState() == 1)
             return false;
-        var code = evt.which;
-        console.log(code);
-        var valid = (code >= 48 && code <= 57) || // left numbers
-                    (code >= 96 && code <= 105) || // right numbers
-                    (code >= 37 && code <= 40) || // arrow keys
-                    code == 8 || // backspace
-                    code == 46 || // delete
-                    code == 186; // colon sign
-        if(!valid)
-            return false;
 
-        if(code == 38 || code == 40) {
+        var code = evt.which;
+        if(evt.which == 38 || evt.which == 40) {
             var times = parseTimeStr(timing.val());
             if(times == null)
                 showCurDetail();
             else {
                 if(code == 38)
-                    seconds += 0.2;
+                    seconds += 0.1;
                 else if(code == 40)
-                    seconds -= 0.2;
+                    seconds -= 0.1;
                 timing.val(getTimeStr(seconds));
             }
-            return false;
         }
 
-        return true;
+        return false;
     });
 }
 
